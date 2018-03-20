@@ -1,14 +1,39 @@
 # PHPFolderIndexSymlinks
+Script to create an index folder based on the starting word character of each subfolder or file in
+the source.  Each item will be indexed as a symlink.
+
+## For Example
+Suppose you have a directory:
+
+Documents
+ - word.txt
+ - Abc.pdf
+ - .test
+
+You run command:
+
+    fis Documents "Documents Index"
+
+You now have a new directory:
+
+Documents Index
+ - a
+    - Abc.pdf (symlink to original)
+ - t
+    - .test (symlink to original)
+ - w
+    - word.txt (symlink to original)
 
 ## Install 
-You can run the script directly as needed.  To install for common use:
+To install for general common use:
 
     curl -sL https://git.io/fis.php > fis && chmod +x fis && sudo mv fis /usr/bin/
 
 Run the same command to update as needed.
 
+
+
 ## Usage
-NOTE: This section assumes you install as listed above, or otherwise alias the script to "fis"
 
     fis {--option=value} <source> [target]
 
@@ -22,3 +47,5 @@ NOTE: This section assumes you install as listed above, or otherwise alias the s
         --ignore=path - ignore file by the given name within the source directory.  Repeat this
                         flag for multiple ignores.
         --verbose     - display timestamps and verbose output
+
+NOTE: This assumes you install as listed above, or otherwise alias the script to "fis"
