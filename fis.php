@@ -81,6 +81,10 @@ try {
         if (preg_match('/^[^a-z0-9]*([a-z0-9])/i', $filename, $matches))
         {
             $index = strtolower($matches[1]);
+
+            // reduce all numbers to single folder
+            if (is_numeric($index))
+                $index='0-9';
         }
 
         lg(" --- Indexing under '$index'");
