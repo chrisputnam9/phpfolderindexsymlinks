@@ -24,6 +24,10 @@ Documents Index
  - w
     - word.txt (symlink to original)
 
+## Requirements 
+ - Unix (tested on Linux, expected to work elsewher)
+ - PHP (tested with PHP 7.1, expected to work on 7.X and 5.X)
+
 ## Install 
 To install for general common use:
 
