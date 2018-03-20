@@ -17,11 +17,35 @@ try {
 
     // Options
     $config = array(
-        'verbose' => true,
+        'verbose' => false,
+        'dryrun' => false,
         'ignore' => array('.', '..'),
     );
 
     lg('Evaluating Options');
+    foreach ($argv as $a => $arg)
+    {
+        if (preg_match('/^--([^\=]+)(\=(.*))?$/', $arg, $matches))
+        {
+            $key = $matches[1];
+            if (!isset($config[$key])) continue;
+
+            $value = isset($matches[2]) ? $matches[3] : true;
+
+            if (is_array($config[$key]))
+                $config[$key][] = $value;
+            else
+                $config[$key] = $value;
+
+            unset($argv[$a]);
+        }
+    }
+    $argv = array_values($argv);
+
+    lg('Processed Options:');
+    lg($config);
+
+    if ($config['dryrun']) $config['verbose'] = true;
 
     if (empty($argv[1]) or !is_dir($argv[1]))
         lg("Must specify valid source directory to be indexed", 2);
@@ -29,10 +53,11 @@ try {
     $source = realpath($argv[1]);
     $target = empty($argv[2]) ? $source."__index" : $argv[2];
 
-    mkdir($target, 0755, true);
-
-    if (!is_dir($target))
-        lg("Failed to create target directory ($target)", 3);
+    if (empty($config['dryrun']))
+    {
+        mkdir($target, 0755, true);
+        if (!is_dir($target)) lg("Failed to create target directory ($target)", 3);
+    }
 
     lg("Indexing '$source' to '$target'");
 
@@ -56,21 +81,21 @@ try {
         if (!in_array($index, $index_cache))
         {
             lg(" --- Creating folder for '$index'");
-            mkdir($target . DS . $index, 0755, true);
+            if (empty($config['dryrun']))
+                mkdir($target . DS . $index, 0755, true);
             $index_cache[]= $index;
         }
 
         $from = $source . DS . $filename;
         $to = $target . DS . $index . DS . $filename; 
         lg(" --- Symlinking '$from' to '$to'");
-        symlink($from, $to);
+        if (empty($config['dryrun']))
+            symlink($from, $to);
 
     }
     closedir($dir);
 
     lg('Success!');
-
-
 
 } catch (Exception $e) {
     lg($e->getMessage(), 1);
