@@ -3,7 +3,7 @@
 ## Install 
 You can run the script directly as needed.  To install for common use:
 
-    curl -s https://raw.githubusercontent.com/chrisputnam9/phpfolderindexsymlinks/master/fis.php > fis && chmod +x fis && sudo mv fis /usr/bin/
+    curl -s https://git.io/fis.php > fis && chmod +x fis && sudo mv fis /usr/bin/
 
 Run the same command to update as needed.
 
