@@ -78,7 +78,7 @@ try {
         lg(" - $filename");
 
         $index = '_';
-        if (preg_match('/^\W*(\w)/', $filename, $matches))
+        if (preg_match('/^[^a-z0-9]*([a-z0-9])/i', $filename, $matches))
         {
             $index = strtolower($matches[1]);
         }
