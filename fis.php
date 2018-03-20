@@ -17,9 +17,10 @@ try {
 
     // Options
     $config = array(
-        'verbose' => false,
         'dryrun' => false,
+        'help' => false,
         'ignore' => array('.', '..'),
+        'verbose' => false,
     );
 
     lg('Evaluating Options');
@@ -44,6 +45,12 @@ try {
 
     lg('Processed Options:');
     lg($config);
+
+    if ($config['help'])
+    {
+        usage();
+        exit;
+    }
 
     if ($config['dryrun']) $config['verbose'] = true;
 
@@ -99,7 +106,6 @@ try {
 
 } catch (Exception $e) {
     lg($e->getMessage(), 1);
-    die;
 }
 
 /**
@@ -125,5 +131,32 @@ function lg($data, $error=false)
     echo $data . "\n";
 
     if ($error)
-        die;
+    {
+        echo "--------------------\n";
+        usage();
+        exit($error);
+    }
+}
+
+/**
+ * Usage
+ */
+function usage()
+{
+    echo <<<USAGE
+USAGE:
+    fis {--option=value} <source> [target]
+
+    source (required) - The folder to index
+    target (optional) - The folder in which to create the index.  If not specified, it will
+                            default to "source__index"
+
+    Options:
+        --dryrun      - show output without any actual side effects.  Automatically enables verbose.
+        --help        - show usage help
+        --ignore=path - ignore file by the given name within the source directory.  Repeat this
+                        flag for multiple ignores.
+        --verbose     - display timestamps and verbose output
+USAGE;
+
 }
