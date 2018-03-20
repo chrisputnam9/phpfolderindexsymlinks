@@ -1,4 +1,5 @@
 <?php
+#!/usr/bin/php
 
 /**
  * Usage:
