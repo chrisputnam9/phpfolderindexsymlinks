@@ -1,13 +1,8 @@
 <?php
-#!/usr/bin/php
 
 /**
- * Usage:
- *
- * php fis.php <source> [target]
- *
- * source: Required.  Folder to create an index for
- * target: Optional. Defaults to source__index
+ * README:
+ * https://github.com/chrisputnam9/phpfolderindexsymlinks
  */
 
 // Anything uncaught
