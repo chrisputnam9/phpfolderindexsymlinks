@@ -89,19 +89,39 @@ try {
 
         lg(" --- Indexing under '$index'");
 
+        $to_dir = $target . DS . $index;
+
         if (!in_array($index, $index_cache))
         {
             lg(" --- Creating folder for '$index'");
             if (empty($config['dryrun']))
-                mkdir($target . DS . $index, 0755, true);
+                mkdir($to_dir, 0755, true);
             $index_cache[]= $index;
         }
 
+        $to_dir = realpath($to_dir);
+        $to = $to_dir . DS . $filename; 
         $from = $source . DS . $filename;
-        $to = $target . DS . $index . DS . $filename; 
+
         lg(" --- Symlinking '$from' to '$to'");
+        $from = getRelativePath($to_dir, $from);
+        lg(" --- Relative path: '$from'");
         if (empty($config['dryrun']))
-            symlink($from, $to);
+        {
+            $original_dir = getcwd();
+
+            $success = chdir($to_dir);
+            if (empty($success))
+                lg("Unable to change directory to '$to_dir'", 4);
+
+            $success = symlink($from, $filename);
+            if (empty($success))
+                lg("Unable to symlink ($from, './')", 5);
+
+            $success = chdir($original_dir);
+            if (empty($success))
+                lg("Unable to change directory back to '$original_dir'", 6);
+        }
 
     }
     closedir($dir);
@@ -110,6 +130,49 @@ try {
 
 } catch (Exception $e) {
     lg($e->getMessage(), 1);
+}
+
+/**
+ * Get relative path from given path to another
+ * Credit: https://goo.gl/g53sMe
+ */
+function getRelativePath($from, $to)
+{
+    // remove trailing slashes
+    $from = rtrim($from, DS);
+    $to   = rtrim($to, DS);
+
+    // Add trailing slash if directory
+    $from = is_dir($from) ? $from . DS : $from;
+    $to = is_dir($to) ? $to . DS : $to;
+
+    // split by directory separators
+    $from     = explode(DS, $from);
+    $to       = explode(DS, $to);
+    $relPath  = $to;
+
+    // Loop through from levels
+    foreach($from as $depth => $dir) {
+
+        // find first non-matching dir
+        if($dir === $to[$depth]) {
+            // ignore this directory
+            array_shift($relPath);
+        } else {
+            // get number of remaining dirs to $from
+            $remaining = count($from) - $depth;
+            if($remaining > 1) {
+                // add traversals up to first matching dir
+                $padLength = (count($relPath) + $remaining - 1) * -1;
+                $relPath = array_pad($relPath, $padLength, '..');
+                break;
+            } else {
+                $relPath[0] = './' . $relPath[0];
+            }
+        }
+    }
+
+    return implode('/', $relPath);
 }
 
 /**
@@ -136,8 +199,11 @@ function lg($data, $error=false)
 
     if ($error)
     {
-        echo "--------------------\n";
-        usage();
+        if (in_array($error, array(2,3)))
+        {
+            echo "--------------------\n";
+            usage();
+        }
         exit($error);
     }
 }
